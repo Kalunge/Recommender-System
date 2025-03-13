@@ -283,11 +283,29 @@ class Vehicle{
 - This results in a lot of dependencies 
 - Spring is a dependency injection framework that makes the process of managing these dependencies easier
 
+## Filter Interface
+- One way to make the code loosely coupled is by using an interface called Filter.
+- an interface contains abstract methods whose implementation is left to the classes using it. 
 
+- Loose coupling is achieved by making the implementation class use the interface instead of one of its mplementations
+- the filter is injected into the recommender using a constructor
+- the getRecommendations method now belongs to the interface 
+- by using the interface instead of actual implementation, we can dynamically choose which algorithm to use.
+- hereby the recommender implementation clas is made independent of the filter implementation and now calls method of the Filter interface
+- `Filter` is a dependency of the Recommender Implementation. we still have to create an object f recommenderimplementation and an Object of Filter and pass the objects to the constructor
 
-
-
-
+## Managing Beans and Dependencies
+- so far, we have created objects f RecommenderImplementation class and two classes implementing the Filter interface.
+- we are binding the objects together in the constructor.
+- our code is now loosely coupled as we are passing the name of the filter to be used as a constructor argument. 
+- Spring automates the process of creating objects and binding them together .
+- it takes the responsibility of creating instances of classes and binding instances based on their dependencies.
+- the instances or objects that Spring manages are called Beans
+- to manage objects and dependencies, spring requires information about three things
+  - Beans
+  - Dependencies
+  - Location of beans
+- 
 
 
 
