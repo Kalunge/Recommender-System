@@ -390,7 +390,28 @@ a summarry of the actions is shown below
 - if we remove the @Component from the RecommenderImplementation class as well, we will get an error when trying to execute the getBean() method as no beans exist.
 - if we add @Component to the collaborative filter class, Spring will not know which bean of Filter type to autowire. it says, RecommenderImplementation required a single bean but 2 were found.
 
+## Autowiring by Type - @Primary
+- here we will learn how Spring dynamically autowires a dependency in the case it finds more than one component of the same type.
 
+### Dynamic bean selection
+- we saw Spring  manage two beans of the RecommenderImplementation and ContentBasedFiltee classes for us.
+- now, we will add anothr bean to see how Spring can dynamically choose a bean if it finds two matches of the same type.
+- we will add the @Component annotation on the collaborativefilter class to declare it a bean
+- now both implementations of the Filter interface care beans.
+- preciously Spring searched for a dependency to be autowired in the recommenderimplementation object, it only found one bean matching the type.
+- now when we run the application it fails to start and it throws NoUniqueBeanDefinitionException saying requreid a single bean, but two were found
+
+### @Primary Annotation
+- one way Spring can choose between two beans of the same type is by giving one bean priority over the other.
+- the @Primary annotation is used for making a component the default choice when multiple beans of the same type are found
+- Let's say we want the collaborative filter to take precedence, we will add the @Primary annotation on the CollaborativeFilter class and import the annotation form spring context
+- when we run the application now, it uses CollaborativeFilter as expected.
+
+- using `@Primary` is called `autowiring by type`
+- we are looking for instances fo type Filter.
+- if we make both beans primary by adding the @Primary annotation to both implementations of the Filter nterface, we will get an error.
+- This happens because Spring does not know which one to inject in the RecommenderImplementation object.
+- the error message states `more than one 'primary' bean found among candidates`
 
 
 
