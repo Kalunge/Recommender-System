@@ -6,16 +6,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class RecommenderImplementation {
 
+    private Filter collaborativeBasedFilter;
 
-    private Filter filter;
-
-    public RecommenderImplementation(Filter filter) {
+    public RecommenderImplementation(Filter collaborativeBasedFilter) {
         super();
-        this.filter = filter;
+        this.collaborativeBasedFilter = collaborativeBasedFilter;
     }
 
     public String[] recommendMovies(String movie) {
-        System.out.println("Name of fileter in use" + filter + "\n");
-        return filter.getRecommendations("Finding Dory");
+        System.out.println("Name of fileter in use" + collaborativeBasedFilter + "\n");
+        return collaborativeBasedFilter.getRecommendations("Finding Dory");
     }
 }

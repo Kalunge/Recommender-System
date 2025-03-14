@@ -413,7 +413,58 @@ a summarry of the actions is shown below
 - This happens because Spring does not know which one to inject in the RecommenderImplementation object.
 - the error message states `more than one 'primary' bean found among candidates`
 
+## Autowiring by Name
+- let us have a look at autowiring by name and see which approach has a higher priority
+- we looked at the autowiring by type approach where priority was given two the collaborative filter using the @Primary annotation
+- Another approach is autowiring by name where we specify the bean that is to be used by name.
+- in thus approach, while creating an object, the dependency is injected by matching the name of the reference variable to the bean name
+- the developer has to ensure that the variable name is the same as its bean name.
 
+### Implementation
+- we will begin by ommmiting the @Primary annotatio from the CollaborativeFilter class
+- now , to let spring know which bean to use, we will change the variable name in the Recommn=enderImplementation class to match the bean name. as follows
+
+```java
+public class RecommenderImplementation {
+  @Autowired
+  private Filter contentBasedFilter;
+
+  public String [] recommendMovies (String movie) {		
+    System.out.println("\nName of the filter in use: " + contentBasedFilter + "\n");
+    String[] results = contentBasedFilter.getRecommendations("Finding Dory");
+    return results;
+  }
+}
+```
+
+- now when the application is run, it chooses the ContentBasedFilter bean for autowiring.
+- when Spring finds two beans of the same type(Filter), it determines that the bean to inject is the one whose name matches the bean with the @Component annotation.
+- in other woords, the variable name(contentBasedFilter) matches the bean na,me (ContentBasedFilter)
+```java
+public class RecommenderImplementation {
+  @Autowired
+  private Filter contentBasedFilter;
+  //...
+}
+```
+
+```java
+@Component
+public class ContentBasedFilter implements Filter{
+  //...
+}
+```
+- as an exercise, lets see what happens if the bean name and variable names are different.
+- Let us change the name of the variable to filter. when the application is run, autowiring does not take place as expected, we get the `NoUniqueBeanDefinitionException`
+- we have seen two autowiring approaches so far. to see which one takes precedence, we will use the @Primary annotation on Collaborative filter class and use the autowiring by name by using contentBasedFilter as the name of the variable of type Filter in RecommenderImplementation class.
+
+### Prioritising autowiring approaches
+- the application chooses the CollaborativeFilter bean, showing @Primary has a higher priority
+- this is because @Autowired annotation tries to resolve dependency by type first. 
+- if it fails to resolve a conflict and finds more than one bean of the same type then it tries to resolve it by name.
+- the autowiring by name approach is advantageous when we want to use one bean in one situation and another bean i some other situation
+- using @Primary will always give preference to one bean, which is impractical if we want to use different beans in different scenarios
+- autowiring by name ensures that if we have some other component which wants to use another type of bean, it can request Spring by using a different variable name. 
 
 
 
