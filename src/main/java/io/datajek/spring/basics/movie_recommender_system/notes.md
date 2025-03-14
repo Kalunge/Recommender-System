@@ -305,12 +305,90 @@ class Vehicle{
   - Beans
   - Dependencies
   - Location of beans
-- 
 
+## @Component
+- if we want Spring to create and manage objects, we can do so by adding the @Component annotation at the beginning of the class and importing the Component from springFramework
+- if we add the @Component annotation to our recommenderImplementation class and the contentBasedFilter class, the Spring container will have two beans. 
 
+## @Autowired
+- the second thing Spring needs to know is the dependencies of each Object.
+- the `@Autowired ` annotation is used for this purpose and we need to import it to be able to use it. 
+- in our code, the contentBasedFilter class is a dependency of the RecommenderImplementation class.
+- the @Autowired annotation tells Spring the recommenderimplementation needs an object of type Filter. in other words, Filter is a dependency of the remommenderclass
 
+- so far the spring container has two beans and it is able to identify that the recommenderimplementation needs a Filter dependency
 
+## @ComponentScan
+- the third thing that Spring requires from the developer, is the location of the beans so that it can find them and autowire the dependencies.
+- the @ComponentScan annotation is used for this purpose.
+- this annotation can be used with or without arguments
+- it tells Spring to scan a specific package and all of its sub-packages.
+- in our case, all the files that contain beans are in the same package
+- since we are using Spring Boot, it uses the @SpringBootApplication annotation on the main class. this annotation is equivalent to the following three annotations
+  - **Configuration**: declares a class as the source for beans declaration
+  - **EnableAutoConfiguration**: allows the application to add beans using classpath definitions
+  - **ComponentScan**: directs Spring to search for components in the path specified
+- thus we do not need to use `@ComponentScan` in our application 
 
+## @SpringBootApplication
+- `@SpringBootApplication` tells Spring to scan all the files in the package where the class with this annotation is present
+- it also scans any sub-packages of the package where it is placed.
+- when we use the `@Component`,` @Autowired` and `@SpringBootApplication` annotations we no longer need to instanciate the RecommenderImplementation class.
+
+- the beans that Spring creates are managed by the `ApplicactionContext`.
+- we can get information about a bean from the Applicatio context.
+- the run() method returns the application context, which can be assigned to a variable appcontext
+- then the getBean() method of ApplicationContext can be used to get the bean of a particular class.
+- we will create a local variable recommender to assign the bean to it. 
+
+```java
+@SpringBootApplication
+public class MovieRecommenderSystemApplication {
+    public static void main(String[] args) {
+        // application context manages the beans and dependencies
+        ApplicationContext appContext = SpringApplication.run(MovieRecommenderSystemApplication.class, args);
+
+        // we can use appcontext to find which filter is being used
+        RecommenderImplementation recommender = appContext.getBean(RecommenderImplementation.class);
+
+        // call method to get recommendations
+        String[] result = recommender.recommendMovies("Finding Dorry");
+
+        System.out.println(Arrays.toString(result));
+
+    }
+}
+```
+
+- instead of us having to create an instance of the RecommenderImplementation class , Spring applicaction context creates the beans. we can simply pick it up from there and use it to execute the recommendMovies method
+- this might look complex and unnecessary in the beginning, but consider for a moment an application that has hundreds of beans, each having a number of dependencies.
+- the fact that we do not have to explicitly create beans and manually wire the dependencies makes the job of a developer very easy
+- when we run the application, the application shows that the bean being used is the ContentBased filter.
+- if the @Component annotation is used on the CollaborativeBasedFilter instead, the output wll change accordingly. 
+
+- To understand what goes on in the background, we will change the logging level to debug.
+- this is done by adding the follwing line to the `application.properties` file.
+```yaml
+logging:
+  level:
+    org.springFramework: debug
+```
+when run, the next code widget will show the log of all the actions that are being performed in the background.
+a summarry of the actions is shown below
+
+* Loadng source class... The package is being searched. spring starts with a component scan to find anything with @Component as well as other annotations
+* Identified candidate component class... Spring identifies two candidates which have the @Component annotation as we have only used it in two places in our code
+* Creating shared instance of Singleton bean MovieRecommenderSystemApplication
+* Creating shared instance of Singleton bean ContentBasedFilter. Spring starts creating instances of the beans. it creates beans that do not have any dependency first
+* creating shared instance of MovieRecommendatioImplementation
+* Autowiring type bean name recommenderImplmentation via constructor to bean named ContentBasedFilter
+
+- Now Spring can autowire the dependency using the constructor that we have provided and creates the RecommenderImplementation bean.
+- To better understand these annotations, we can play around with the code and see what error messages Spring throws when some of the annotations are missing
+- the error messages can be seen at the end of the logs
+- if we remove \2Component from the ContentBased class, Spring will throow an error when trying to autowire the dependency saying it required a bean of type Filter that could not be found
+- if we remove the @Component from the RecommenderImplementation class as well, we will get an error when trying to execute the getBean() method as no beans exist.
+- if we add @Component to the collaborative filter class, Spring will not know which bean of Filter type to autowire. it says, RecommenderImplementation required a single bean but 2 were found.
 
 
 
