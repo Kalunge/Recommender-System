@@ -466,6 +466,87 @@ public class ContentBasedFilter implements Filter{
 - using @Primary will always give preference to one bean, which is impractical if we want to use different beans in different scenarios
 - autowiring by name ensures that if we have some other component which wants to use another type of bean, it can request Spring by using a different variable name. 
 
+## Autowiring - @Qualifier annotation
+-  like @Primary, the @Qualifier annotation give priority to one bean over the ther if two beans of the same type are found.
+- the bean whose name is specified in the @Qualifier annotation qualifies to be injected as a dependency.
+- the @Qualifier annotation can be used in a scenarion when we have multiple objectes of the same type and autowiring by name cannot be used because the variable name does not match any bean name.
+- say, we want to use the name `CBF` for ContentBasedFilter. we can either specify it in the @Component annotation or use Qualifier annotation on the class. both approaches, yield the same result.
+
+```java
+@Component("CBF")
+public  class ContentBasedFilter implements Filter{
+  //...
+}
+```
+**Second approach**
+```java
+@Component
+@Qualifier("CBF")
+public  class ContentBasedFilter implements Filter{
+  //...
+}
+```
+- now we can use the @Qualifier annotation in the RecommenderImplementaton class where the dependency is injected to indicate which bean to use
+```java
+public class RecommenderImplementation {
+  
+  @Autowired
+  @Qualifier("CBF")
+  private Filter filter;
+
+  public String [] recommendMovies (String movie) {		
+      //...
+  }
+}
+```
+
+- the name of the Filter implementation used with the @Qualifier annotation has to match the name used with the @Component of @Qualifier annotation on the class.
+- when the application is run, the ContentBasedFilter bean qualifies to be autowired
+- we can add a qualifier "CBF" for the contentBased filter as well and we can toggle or use the appropriate filter whenever necessary
+- Depending on which filter is required in a given scenario, we can change the @Qualifier annotation in the RecommenderImplementartio class.
+
+### Comparison with @Primary
+- the @Qualifier annotation takes precedence over the @Primary annotation
+- to show this we can add the @Primary annotation to the contentBased filter class abd run the application
+- when the app is run, the CollaboratifeFilter bean gets autowired.
+- this is because @Primary is the default setting, while @Qualifier is specific.
+- @Primary defines the default selection when no other information is available 
+- it tells Spring to use the bean marked as primary as its first choice if it encounters mire than one bean of the same type.
+- on the other hand, @Qualifier tells Spring to use a specific bean if it finds multiple beans of matching type.
+- @Primary annotation should be used if there is no one clear favourite to be used in a majority of situations.
+- in some cases, one algorithm might be more efficient or more important than the rest and is declared as the primary choice.
+- the bean with @Primary gets chosen unless another bean is required, which can be specified with @Qualifier.
+- the bean with @Qualifier is only used to request an alternate bean in case the primary choice is not required.
+
+- @Autowired annotation resolves dependencies by type.
+- if there are more than one beans of the same type, a conflict arises.
+- we have seen three different approaches to resolve conflicts
+- they can be resolved using the @Primary annotation, renaming the variable to match the name if the class, or by using the @Qualifier annotation.
+
+## Constructor and Setter injection
+- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

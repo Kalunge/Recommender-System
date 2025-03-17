@@ -1,9 +1,10 @@
 package io.datajek.spring.basics.movie_recommender_system.filters;
 
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.*;
 
 @Component
-
+@Qualifier("CF")
 public class CollaborativeBasedFilter implements Filter {
     @Override
     public String[] getRecommendations(String movie){
