@@ -13,14 +13,19 @@ public class MovieRecommenderSystemApplication {
     public static void main(String[] args) {
         // application context manages the beans and dependencies
         ApplicationContext appContext = SpringApplication.run(MovieRecommenderSystemApplication.class, args);
-
+        System.out.println("Constructor Injection in RecommenderImplemtation class");
         // we can use appcontext to find which filter is being used
+        RecommenderImplementationV2 recommender2 = appContext.getBean(RecommenderImplementationV2.class);
+
         RecommenderImplementation recommender = appContext.getBean(RecommenderImplementation.class);
+
 
         // call method to get recommendations
         String[] result = recommender.recommendMovies("Finding Dorry");
+        String[] result2 = recommender2.recommendMovies("Finding Dorry ");
 
-        System.out.println(Arrays.toString(result));
+        System.out.println(Arrays.toString(result) + " ---> Collaborative based");
+        System.out.println(Arrays.toString(result2) +" ---> Connentbasedfilter");
 
     }
 }

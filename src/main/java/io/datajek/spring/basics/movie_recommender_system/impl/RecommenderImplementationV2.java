@@ -1,22 +1,26 @@
 package io.datajek.spring.basics.movie_recommender_system.impl;
 
+
 import io.datajek.spring.basics.movie_recommender_system.filters.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.*;
 
 @Component
-public class RecommenderImplementation {
+public class RecommenderImplementationV2 {
+
     private Filter filter;
 
     @Autowired
-    public RecommenderImplementation(@Qualifier("collaborativeBasedFilter") Filter filter) {
-        super();
+    @Qualifier("contentBasedFilter")
+    public void setFilter(Filter filter) {
         this.filter = filter;
-        System.out.println("Constructor Invoked");
+        System.out.println("Setter method invoked");
     }
 
     public String[] recommendMovies(String movie) {
         System.out.println("Name of fileter in use" + filter + "\n");
-        return filter.getRecommendations("Finding Dory");
+        return filter.getRecommendations(movie);
     }
 }
+
+

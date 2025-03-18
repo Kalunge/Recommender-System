@@ -524,12 +524,112 @@ public class RecommenderImplementation {
 - they can be resolved using the @Primary annotation, renaming the variable to match the name if the class, or by using the @Qualifier annotation.
 
 ## Constructor and Setter injection
-- 
+- Spring framework identifies dependencies and writes them in
+- Spring framework gives the developer control over how beans are wired in.
+- There are a variety of options to choose from, we will focus on constructor injection and setter injection
+- to show the different ways of dependency injection, we will create a copy of the RecommenderImplementation class and call it RecommenderImplemntationV2
+- one will be used to show constructor injection while the other will demonstrate setter injection
+- we will use the @Autowired annotation at different places in the cide to direct Spring which injection type to use.
+
+### Constructor Injection
+- Autowiring the dependency using a constructor is called **Constructor injection**
+- we wll create a constructor in the RecommnderImplmentation class that initializes the filter to be used for finding movie recommendations
+- since we have two implementations of the Folter interfcae, we need to specify which one to use.
+- if we use the @Primary annotation, then Spring will use the primary bean as the default choice 
+- however, if we want different beans to be used in different scenarios, then the @Qualifier annotation with the bean name can be used to give a hint to Spring about which bean to inject.
+- since we have noot specified bean names with the @Component annotation, their default names will be used
+- **NB:** Default bean name is the class name with the first letter in lowercase
+- to use constructor for injecting deoendencies, we can move the @Autowired annotation to the constructor
+- we will also use the @Qualifier annotation to inject the bean of the Collaborative filter tyoe
+- the @Qualifier annotation cannot be used on the constructor as it results in a annotation is disallowed for this location exception rather, it showuld be used in the argument list right in from of the property that we want to be autowrired.
+
+```java
+@Autowired
+public RecommenderImplementation(@Qualifier("collaborativeFilter") Filter filter) {
+  this.filter = filter;
+  System.out.println("Constructor invoked...");
+}
+```
 
 
+- it should be noted that the use of the @Autowired annotation is optional when using constructors.
+- in the main() method, we will call the getBean() method to show that constructor injection takes place and CollaborativeFilter bean is injected as follows.
+
+```java
+public static void main(String[] args) {
+
+  ApplicationContext appContext = SpringApplication.run( MovieRecommenderSystemApplication.class, args);
+  //RecommenderImplementation injects dependency using constructor
+  System.out.println("Constructor injection in RecommenderImplementation class");
+  RecommenderImplementation recommender = appContext.getBean(RecommenderImplementation.class);
+  String[] result = recommender.recommendMovies("Finding Dory");
+  System.out.println(Arrays.toString(result));
+}
+```
+- when the application is run, Spring Injects the collboratifeFilter bean in the RecommenderImplementation class using the constructor 
+- the constructor invoked message is printed on the console
+
+## Setter Injection
+- another way to wire in a dependency is by using a setter method.
+- we will create a setter method in the RecommendationImplementationV2 clas called setFilter()
+
+```java
+public class RecommenderImplementation2 {
+
+	private Filter filter;
+	
+    public void setFilter(Filter filter) {
+        this.filter = filter;
+        System.out.println("Setter method invoked..");
+    }
+}
+```
+we can guide spring to use the setter method by using the @Autowired annotation before the method
+we will also use the @Qualifier annotation to instruct Srping to use the ContentBasedFilter bean as follows
+
+```java
+@Autowired
+@Qualifier("contentBasedFilter")
+public void setFilter(Filter filter) {
+  //...
+}
+```
+
+- in the main method, we will call the getBean() method to show that setter injection takes place and CintentBasedFilter bean is injected as follows
+```java
+@Autowired
+@Qualifier("contentBasedFilter")
+public void setFilter(Filter filter) {
+  //...
+}
+```
+- when the application is run, Spring injects the ContentBasedFilter bean in the RecommenderImplementationV2 class using the setFilter()nmethod.
+- the Setter invoked message is also displayed on the console
 
 
+### Field Injection
+- we have seen two dependency injection methods but Spring was already performing deoendency injection without a constructor or setter method in the RecommenderImplmentation class
+- we have been using @Autowired annotation directly on the Filter field.
+- this is called **Field Injection**
 
+```java
+public class RecommenderImplementation {
+  @Autowired
+  private Filter filter;
+
+  //...    
+}
+```
+- using field injection keeps the code simple and readable, but it is unsafe because Spring can set private fields of the objects
+- Testing also becomes inconvinient because we need a way to perform dependency injection for testing
+- yet another disadvantage is that a developer may add a lot of optional dependencies which can make the application complex.
+- if there was a constructor, then each additional dependency would result in increasing the number of arguments of the constructor. 
+- Both constructor and setter injection result in the same outcome
+- However, there are some differences.
+- Setter injection is more readable as it specifies the name of the dependency as the methodnthe method name but the number of setter methods increases with each increasing dependency increasing the boilerplate code
+- Setter injection is used to avoid the `BeanCurrentlyInCreationException` raised in case of a circular dependency, because unlike constructor injection where dependencies are injected at the time when context is loaded, setter injection injects deoendencies when they are needed
+- Constructor injection ensures that all dependencies are injected because an object cannot be constructed untill all its dependencies are available.
+- it also ensures immutability as the state of the bean cannot be modified after reation
 
 
 
