@@ -631,11 +631,122 @@ public class RecommenderImplementation {
 - Constructor injection ensures that all dependencies are injected because an object cannot be constructed untill all its dependencies are available.
 - it also ensures immutability as the state of the bean cannot be modified after reation
 
+## Bean Scope
+- The Spring container manages beans
+- this term bean scope refers to the lifecycle and the visibility of beans 
+- it tells how long the bean lives, how many instances of the bean are created, and how the bean is shared
+
+## Types of bean scopes
+- there are six types: Singleton, prototype, request, session, application, and websocket.
 
 
+## Singleton
+- the default scope of a bean is Singleton, in which only one instance of the bean is created and cached in memory
+- Multiple requests for the bean return a shared reference to the same bean.
+- in contrast, **prototype** scope results in the creation of new beans whenever a request for the bean is made to the application context
+- Application context manages the beans and we can retrieve a bean using the getBean() method
+- if we request the app context for the contentBased filter bean three times we get the same bean
 
+```java
+@SpringBootApplication
+public class MovieRecommenderSystemApplication {
 
+	public static void main(String[] args) {
+		
+		//ApplicationContext manages the beans and dependencies
+		ApplicationContext appContext = SpringApplication.run(MovieRecommenderSystemApplication.class, args);
 
+		//Retrieve singleton bean from application context thrice
+		ContentBasedFilter cbf1 = appContext.getBean(ContentBasedFilter.class);	
+		ContentBasedFilter cbf2 = appContext.getBean(ContentBasedFilter.class);	
+		ContentBasedFilter cbf3= appContext.getBean(ContentBasedFilter.class);	
+					
+		System.out.println(cbf1);
+		System.out.println(cbf2);
+		System.out.println(cbf3);
+	}
+}
+```
+- as can be verified from the output, all beans are the same
+- the app context did not create a new bean when we reuqested it the second and third time
+- Rather, it returned the reference to the bean already created.
+- Singleton bean scope is the default scope
+- it is used to minimize the number of objects created 
+- Beans are created with the same memory address.
+- this type of scope is best suited for cases where stateless beans are required.
+- on the contrary, prototype bean scope is used when we need to maintain the state of the beans
+
+## Prototype Scope
+- now we will change the scope of the CollaborativeFilter bean from singleton to prototype
+- for this we will use the @Scope annotation
+```java
+//Option 1
+@Scope("prototype")
+
+//Option 2 
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE);
+```
+
+- just like the previous step, we will ask the application context for the CollaborativeFilter bean three times and output the results in the console
+
+```java
+ public static void main(String[] args) {
+  //ApplicationContext manages the beans and dependencies
+  ApplicationContext appContext = SpringApplication.run(MovieRecommenderSystemApplication.class, args);
+
+  //...
+
+  //Retrieve prototype bean from application context thrice
+  CollaborativeFilter cf1 = appContext.getBean(CollaborativeFilter.class);	
+  CollaborativeFilter cf2 = appContext.getBean(CollaborativeFilter.class);	
+  CollaborativeFilter cf3 = appContext.getBean(CollaborativeFilter.class);
+
+  System.out.println(cf1);
+  System.out.println(cf2);
+  System.out.println(cf3);
+}
+```
+
+- This time the application context will return three different objects
+- it will create a new object every time we invoke the `getBean()` method
+- Spring creates a Singleton bean even before we ask for it while a prototype bean is not created till we request Spring for the bean
+- in the code widget below, we will print a mesage in the ContentBasedFilter and CollaborativeBasedFilter constructors and comment everything in the main method
+- when the application is run, the output shows that Spring has crated the ContentBasedFilter bean but the CollaborativeFilter bean has not yet been created
+
+```java
+package io.datajek.spring.basics.movierecommendersystem.lesson8;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootApplication
+public class MovieRecommenderSystemApplication {
+
+	public static void main(String[] args) {
+		
+		//ApplicationContext manages the beans and dependencies
+		ApplicationContext appContext = SpringApplication.run(MovieRecommenderSystemApplication.class, args);
+
+		// Retrieve singleton bean from application context thrice
+		//	ContentBasedFilter cbf1 = appContext.getBean(ContentBasedFilter.class);	
+		//	ContentBasedFilter cbf2 = appContext.getBean(ContentBasedFilter.class);	
+		//	ContentBasedFilter cbf3= appContext.getBean(ContentBasedFilter.class);	
+					
+		// Retrieve prototype bean from application context thrice
+		//	CollaborativeFilter cf1 = appContext.getBean(CollaborativeFilter.class);	
+		//	CollaborativeFilter cf2 = appContext.getBean(CollaborativeFilter.class);	
+		//	CollaborativeFilter cf3 = appContext.getBean(CollaborativeFilter.class);
+	}
+}
+```
+- if the code creating multiple objects of both classes is uncommented, it will be seen that the singleton bean constructor is called only once while the prototype bean constructor is called three times
+
+## Spring vs Gang of Four Singleton
+- it is important to note that there is a difference between the Spring singleton and the Gang of Four(GoF) singleton design patterns
+- The singleton design pattern as specified by the GoF means one bean per JVM.
+- However, in Spring it means one bean per application context.
+- By the GoF definition, even if there were more than one application contexts running on the same JVM, there would still be only one instance of the Singleton class
 
 
 

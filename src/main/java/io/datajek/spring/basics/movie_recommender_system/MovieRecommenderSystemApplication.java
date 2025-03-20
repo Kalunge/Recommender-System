@@ -14,6 +14,20 @@ public class MovieRecommenderSystemApplication {
         // application context manages the beans and dependencies
         ApplicationContext appContext = SpringApplication.run(MovieRecommenderSystemApplication.class, args);
         System.out.println("Constructor Injection in RecommenderImplemtation class");
+
+        // retrieve singleton bean from application context thrice
+        ContentBasedFilter cbF1 = appContext.getBean(ContentBasedFilter.class);
+        ContentBasedFilter cbF2 = appContext.getBean(ContentBasedFilter.class);
+        ContentBasedFilter cbF3 = appContext.getBean(ContentBasedFilter.class);
+
+        // Retrieve protptype bean from application context thrice
+        CollaborativeBasedFilter cbF4 = appContext.getBean(CollaborativeBasedFilter.class);
+        CollaborativeBasedFilter cbF5 = appContext.getBean(CollaborativeBasedFilter.class);
+        CollaborativeBasedFilter cbF6 = appContext.getBean(CollaborativeBasedFilter.class);
+
+        System.out.println(cbF4);
+        System.out.println(cbF5);
+        System.out.println(cbF6);
         // we can use appcontext to find which filter is being used
         RecommenderImplementationV2 recommender2 = appContext.getBean(RecommenderImplementationV2.class);
 
