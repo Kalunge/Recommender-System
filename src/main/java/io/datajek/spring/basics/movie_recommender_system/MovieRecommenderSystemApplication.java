@@ -2,6 +2,7 @@ package io.datajek.spring.basics.movie_recommender_system;
 
 import io.datajek.spring.basics.movie_recommender_system.filters.*;
 import io.datajek.spring.basics.movie_recommender_system.impl.*;
+import io.datajek.spring.basics.movie_recommender_system.movies.*;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.*;
@@ -15,31 +16,24 @@ public class MovieRecommenderSystemApplication {
         ApplicationContext appContext = SpringApplication.run(MovieRecommenderSystemApplication.class, args);
         System.out.println("Constructor Injection in RecommenderImplemtation class");
 
-        // retrieve singleton bean from application context thrice
-        ContentBasedFilter cbF1 = appContext.getBean(ContentBasedFilter.class);
-        ContentBasedFilter cbF2 = appContext.getBean(ContentBasedFilter.class);
-        ContentBasedFilter cbF3 = appContext.getBean(ContentBasedFilter.class);
+        // retrieve singleton bean from application context
+        ContentBasedFilter filter = appContext.getBean(ContentBasedFilter.class);
+        System.out.println("Content based filter with SIngleton Scope");
+        System.out.println(filter);
 
-        // Retrieve protptype bean from application context thrice
-        CollaborativeBasedFilter cbF4 = appContext.getBean(CollaborativeBasedFilter.class);
-        CollaborativeBasedFilter cbF5 = appContext.getBean(CollaborativeBasedFilter.class);
-        CollaborativeBasedFilter cbF6 = appContext.getBean(CollaborativeBasedFilter.class);
+        // Retrieve Proptotype bean from the singleton bean thrice
+        Movie movie1 = filter.getMovie();
+        Movie movie2 = filter.getMovie();
+        Movie movie3 = filter.getMovie();
 
-        System.out.println(cbF4);
-        System.out.println(cbF5);
-        System.out.println(cbF6);
-        // we can use appcontext to find which filter is being used
-        RecommenderImplementationV2 recommender2 = appContext.getBean(RecommenderImplementationV2.class);
+        System.out.println("Movie bean with prototype scope");
+        System.out.println(movie1);
+        System.out.println(movie2);
+        System.out.println(movie3);
 
-        RecommenderImplementation recommender = appContext.getBean(RecommenderImplementation.class);
-
-
-        // call method to get recommendations
-        String[] result = recommender.recommendMovies("Finding Dorry");
-        String[] result2 = recommender2.recommendMovies("Finding Dorry ");
-
-        System.out.println(Arrays.toString(result) + " ---> Collaborative based");
-        System.out.println(Arrays.toString(result2) +" ---> Connentbasedfilter");
+        // Print instamces of each movie
+        System.out.println("contentbasedFilter instances created " + ContentBasedFilter.getInstances());
+        System.out.println("Movie instances created " + Movie.getInstances());
 
     }
 }
